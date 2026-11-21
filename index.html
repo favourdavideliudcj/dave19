@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AfyaCare Clinic Portal</title>
+  <style>
+    :root {
+      --primary: #0f766e;
+      --primary-hover: #115e59;
+      --bg: #f0fdfa;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #cbd5e1;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --success: #16a34a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 20px 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 25px;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--surface);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      margin-bottom: 18px;
+      color: var(--primary);
+      border-bottom: 2px solid var(--bg);
+      padding-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+    }
+
+    button {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+    }
+
+    .queue-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .filter-select {
+      width: auto;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+    }
+
+    .appointment-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .appointment-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fafafa;
+    }
+
+    .patient-info h3 {
+      font-size: 1.05rem;
+      margin-bottom: 4px;
+    }
+
+    .patient-meta {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .urgency-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-left: 8px;
+    }
+
+    .urgency-Routine { background: #dcfce7; color: var(--success); }
+    .urgency-Urgent { background: #fef3c7; color: var(--warning); }
+    .urgency-Emergency { background: #fee2e2; color: var(--danger); }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-small {
+      width: auto;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+
+    .btn-complete {
+      background: var(--success);
+    }
+    .btn-complete:hover {
+      background: #15803d;
+    }
+
+    .btn-cancel {
+      background: var(--danger);
+    }
+    .btn-cancel:hover {
+      background: #b91c1c;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 30px 0;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div>
+      <h1>AfyaCare Clinic Portal</h1>
+      <p style="font-size: 0.85rem; opacity: 0.9;">Outpatient Booking & Triage Queue</p>
+    </div>
+    <div class="badge" id="queueCount">Waiting: 0</div>
+  </header>
+
+  <div class="grid">
+    <!-- Booking Form -->
+    <div class="card">
+      <h2>Book Appointment</h2>
+      <form id="bookingForm">
+        <div class="form-group">
+          <label for="patientName">Patient Full Name</label>
+          <input type="text" id="patientName" placeholder="e.g., Jane Atieno" required>
+        </div>
+
+        <div class="form-group">
+          <label for="department">Department / Specialist</label>
+          <select id="department" required>
+            <option value="General Consultation">General Consultation</option>
+            <option value="Pediatrics">Pediatrics</option>
+            <option value="Maternal Health">Maternal Health</option>
+            <option value="Dental Clinic">Dental Clinic</option>
+            <option value="Lab & Diagnostics">Lab & Diagnostics</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="urgency">Triage Priority</label>
+          <select id="urgency" required>
+            <option value="Routine">Routine Checkup</option>
+            <option value="Urgent">Urgent (Fever, Pain)</option>
+            <option value="Emergency">Emergency</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="timeSlot">Preferred Time</label>
+          <input type="time" id="timeSlot" required>
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Brief Symptoms / Notes</label>
+          <textarea id="notes" rows="2" placeholder="Optional clinical notes..."></textarea>
+        </div>
+
+        <button type="submit">Add to Clinic Queue</button>
+      </form>
+    </div>
+
+    <!-- Live Queue -->
+    <div class="card">
+      <div class="queue-header">
+        <h2 style="border: none; margin: 0; padding: 0;">Active Patient Queue</h2>
+        <select id="filterDept" class="filter-select">
+          <option value="All">All Departments</option>
+          <option value="General Consultation">General Consultation</option>
+          <option value="Pediatrics">Pediatrics</option>
+          <option value="Maternal Health">Maternal Health</option>
+          <option value="Dental Clinic">Dental Clinic</option>
+          <option value="Lab & Diagnostics">Lab & Diagnostics</option>
+        </select>
+      </div>
+
+      <div id="appointmentList" class="appointment-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Load existing data from localStorage or use sample data
+  let appointments = JSON.parse(localStorage.getItem('clinicAppointments')) || [
+    {
+      id: 1,
+      name: "David Ochieng",
+      department: "General Consultation",
+      urgency: "Urgent",
+      time: "09:30",
+      notes: "Persistent headache and mild fever"
+    },
+    {
+      id: 2,
+      name: "Mary Wanjiku",
+      department: "Maternal Health",
+      urgency: "Routine",
+      time: "10:00",
+      notes: "Antenatal clinic follow-up"
+    }
+  ];
+
+  const form = document.getElementById('bookingForm');
+  const listContainer = document.getElementById('appointmentList');
+  const filterSelect = document.getElementById('filterDept');
+  const queueCountBadge = document.getElementById('queueCount');
+
+  function saveAndRender() {
+    localStorage.setItem('clinicAppointments', JSON.stringify(appointments));
+    renderQueue();
+  }
+
+  function renderQueue() {
+    const selectedDept = filterSelect.value;
+    listContainer.innerHTML = '';
+
+    // Filter by department
+    const filtered = selectedDept === 'All' 
+      ? appointments 
+      : appointments.filter(app => app.department === selectedDept);
+
+    // Sort by priority (Emergency -> Urgent -> Routine)
+    const priorityOrder = { 'Emergency': 1, 'Urgent': 2, 'Routine': 3 };
+    filtered.sort((a, b) => priorityOrder[a.urgency] - priorityOrder[b.urgency]);
+
+    queueCountBadge.textContent = `Waiting: ${appointments.length}`;
+
+    if (filtered.length === 0) {
+      listContainer.innerHTML = `<div class="empty-state">No patients currently waiting in this queue.</div>`;
+      return;
+    }
+
+    filtered.forEach(app => {
+      const item = document.createElement('div');
+      item.className = 'appointment-item';
+      item.innerHTML = `
+        <div class="patient-info">
+          <h3>
+            ${app.name} 
+            <span class="urgency-tag urgency-${app.urgency}">${app.urgency}</span>
+          </h3>
+          <div class="patient-meta">
+            <strong>${app.department}</strong> • Scheduled: ${app.time}
+          </div>
+          ${app.notes ? `<div class="patient-meta" style="margin-top: 4px;">Note: ${app.notes}</div>` : ''}
+        </div>
+        <div class="actions">
+          <button class="btn-small btn-complete" onclick="removeAppointment(${app.id})">Seen</button>
+          <button class="btn-small btn-cancel" onclick="removeAppointment(${app.id})">Cancel</button>
+        </div>
+      `;
+      listContainer.appendChild(item);
+    });
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const newAppointment = {
+      id: Date.now(),
+      name: document.getElementById('patientName').value.trim(),
+      department: document.getElementById('department').value,
+      urgency: document.getElementById('urgency').value,
+      time: document.getElementById('timeSlot').value,
+      notes: document.getElementById('notes').value.trim()
+    };
+
+    appointments.push(newAppointment);
